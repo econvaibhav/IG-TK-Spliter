@@ -1,0 +1,4 @@
+# Preserve exact bytes, including original source line endings.
+* -text
+*.png binary
+*.pdf binary
