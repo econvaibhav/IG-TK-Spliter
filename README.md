@@ -20,4 +20,4 @@ See [environment setup](docs/ENVIRONMENT.md) for the compatibility versions.
 
 ## Documentation
 
-[Environment](docs/ENVIRONMENT.md)
+[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md)
