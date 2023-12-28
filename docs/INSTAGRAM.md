@@ -22,3 +22,26 @@ This is a position test on the current frame; it does not track icon motion.
 
 An accepted icon boundary produces `part_N_reel.mp4` and advances the shared
 segment start and counter.
+
+## Check the feed layout
+
+The second detector keeps BGR values in `[250, 255]`, applies grayscale,
+closing and contour filling, then two dilations, two erosions, vertical border
+lines and inversion. It approximates contours at 4% of their perimeter.
+
+| Condition | Required value |
+| --- | --- |
+| Vertices | Four |
+| Bounding-box width | Greater than analysis width minus 20 pixels |
+| Top coordinate | 45 through 120 pixels, inclusive |
+| Bounding-box height | 150 through 200 pixels, inclusive |
+| Gap from last cut | Strictly greater than 1 second |
+
+A passing layout rule produces `part_N_video.mp4`.
+
+## Order of the two checks
+
+Both methods run on every frame: the icon rule first, then the layout rule on a
+copy of the same original frame. They share `start_time` and `part_counter`.
+An accepted icon cut resets the gap before the layout rule runs. There is no
+initial classifier that chooses between a Reel and a feed video.
