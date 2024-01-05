@@ -11,6 +11,7 @@ the intervals from the recording.
 | Step | Behavior |
 | --- | --- |
 | Frame processing | Reads frames individually and resizes the analysis image to 960 pixels high. |
+| Instagram | Checks heart, comment and share positions, plus a separate four-corner feed-layout rule. |
 | Export | Writes numbered MP4 clips from the original recording, with AAC audio. |
 
 ## Environment
