@@ -21,4 +21,4 @@ See [environment setup](docs/ENVIRONMENT.md) for the compatibility versions.
 
 ## Documentation
 
-[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md)
+[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md)
