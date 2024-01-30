@@ -12,7 +12,13 @@ the intervals from the recording.
 | --- | --- |
 | Frame processing | Reads frames individually and resizes the analysis image to 960 pixels high. |
 | Instagram | Checks heart, comment and share positions, plus a separate four-corner feed-layout rule. |
+| TikTok | Checks heart, share and save positions using platform-specific thresholds. |
 | Export | Writes numbered MP4 clips from the original recording, with AAC audio. |
+
+The platform comes from the folder path. Instagram runs both checks on each
+frame. Icon rules require more than 0.4 seconds since the last cut; the
+Instagram layout rule requires more than 1 second. These are interface
+heuristics, so exported clips should be reviewed before analysis.
 
 ## Environment
 
