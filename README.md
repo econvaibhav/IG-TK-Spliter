@@ -25,6 +25,16 @@ heuristics, so exported clips should be reviewed before analysis.
 Use a separate Python environment and an FFmpeg executable.
 See [environment setup](docs/ENVIRONMENT.md) for the compatibility versions.
 
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| `video_processor.py` | Shared reader, matcher and FFmpeg exporter |
+| `instagram_processor.py` | Instagram icon and layout checks |
+| `tiktok_processor.py` | TikTok icon checks |
+| `IG_*_template.png`, `TK_*_template.png` | Six interface templates |
+| `main*.py` | Legacy local and Slurm entry points |
+
 ## Documentation
 
 [Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md)
