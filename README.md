@@ -14,6 +14,7 @@ the intervals from the recording.
 | Instagram | Checks heart, comment and share positions, plus a separate four-corner feed-layout rule. |
 | TikTok | Checks heart, share and save positions using platform-specific thresholds. |
 | Export | Writes numbered MP4 clips from the original recording, with AAC audio. |
+| Batch processing | Discovers recordings, runs parallel workers and writes per-video logs and a CSV summary. |
 
 The platform comes from the folder path. Instagram runs both checks on each
 frame. Icon rules require more than 0.4 seconds since the last cut; the
@@ -33,6 +34,7 @@ See [environment setup](docs/ENVIRONMENT.md) for the compatibility versions.
 | `instagram_processor.py` | Instagram icon and layout checks |
 | `tiktok_processor.py` | TikTok icon checks |
 | `IG_*_template.png`, `TK_*_template.png` | Six interface templates |
+| `run_hungary_splits.py` | Linux batch launcher |
 | `main*.py` | Legacy local and Slurm entry points |
 
 ## Documentation
