@@ -30,3 +30,24 @@ both OpenCV and MoviePy resources.
 
 After each job it compares source device, inode, size and modification time.
 This metadata check does not hash the recording contents.
+
+## Preflight and processing
+
+Install the [separate environment](ENVIRONMENT.md), then run from the repository
+root. Replace the absolute paths below:
+
+```bash
+.venv/bin/python run_hungary_splits.py \
+  --input /absolute/path/Hungary_Organised \
+  --scope Fidesz/1 \
+  --output /absolute/path/Hungary_Splits \
+  --workers 4 \
+  --check-only
+```
+
+Remove `--check-only` to process recordings. Preflight checks dependencies,
+templates, folder structure, scope and available CPUs. It does not decode
+every recording or establish that every export will succeed.
+
+Always override the default input and output paths when moving to a different
+CSC project or machine.
