@@ -21,10 +21,34 @@ frame. Icon rules require more than 0.4 seconds since the last cut; the
 Instagram layout rule requires more than 1 second. These are interface
 heuristics, so exported clips should be reviewed before analysis.
 
-## Environment
+## Quick start
 
-Use a separate Python environment and an FFmpeg executable.
-See [environment setup](docs/ENVIRONMENT.md) for the compatibility versions.
+Use Linux, a separate Python 3.10-3.12 environment, and FFmpeg on `PATH`.
+Run these commands from the repository root:
+
+```bash
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+ffmpeg -version
+```
+
+The batch launcher expects `Party/Participant/YYYYMMDD/Platform/video.mp4`,
+for example `Fidesz/1/20240328/Instagram/recording.mp4`. It accepts Fidesz or
+Tisza, participants 1-4, and Instagram or TikTok folders.
+
+```bash
+.venv/bin/python run_hungary_splits.py \
+  --input /absolute/path/Hungary_Organised \
+  --scope Fidesz/1 \
+  --output /absolute/path/Hungary_Splits \
+  --workers 4 \
+  --check-only
+```
+
+Replace the paths, run preflight, then remove `--check-only` to start processing.
+Keep input and output roots separate. Use the launcher to preserve originals:
+the base processor deletes its input pathname after export, while the launcher
+passes a private symbolic link. See [running instructions](docs/RUNNING.md).
 
 ## Repository map
 
