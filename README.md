@@ -63,4 +63,4 @@ passes a private symbolic link. See [running instructions](docs/RUNNING.md).
 
 ## Documentation
 
-[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md) · [Running instructions](docs/RUNNING.md)
+[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md) · [Running instructions](docs/RUNNING.md) · [Outputs](docs/OUTPUTS.md)
