@@ -65,3 +65,16 @@ affinity limits scheduling, not the number of threads a library can create.
 
 Each run gets a timestamped directory with a unique suffix, avoiding old output
 paths that the shared exporter would otherwise skip.
+
+## Failures and reruns
+
+Read `summary.csv` and the matching `_logs/*.log` file after each run. A job can
+leave partial clips while reporting zero clips or frames: the counters are
+copied only after the processor returns successfully.
+
+The launcher exits with code 1 if any job failed or needs review. Other jobs
+may have finished successfully. A notebook exception after the final summary
+can simply report that nonzero exit code.
+
+A new invocation starts a fresh run; it does not resume a partial one. Keep
+the old logs when diagnosing errors. See [output and status fields](OUTPUTS.md).
