@@ -78,3 +78,27 @@ can simply report that nonzero exit code.
 
 A new invocation starts a fresh run; it does not resume a partial one. Keep
 the old logs when diagnosing errors. See [output and status fields](OUTPUTS.md).
+
+## Use an isolated interpreter from a notebook
+
+Start the splitter as a separate process so the notebook kernel can retain its
+own dependencies. This cell runs preflight:
+
+```python
+from pathlib import Path
+import subprocess
+
+repo = Path("/absolute/path/FeedSlicer")
+subprocess.run([
+    str(repo / ".venv/bin/python"), "-u",
+    str(repo / "run_hungary_splits.py"),
+    "--input", "/absolute/path/Hungary_Organised",
+    "--scope", "Fidesz/1",
+    "--output", "/absolute/path/Hungary_Splits",
+    "--workers", "4", "--check-only",
+], check=True, cwd=repo)
+```
+
+Remove `--check-only` to launch processing. For a long run, use your allocated
+cluster session and capture its output. This small preflight example does not
+provide process-group cleanup on interruption.
