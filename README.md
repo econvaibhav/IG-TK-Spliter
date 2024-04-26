@@ -50,6 +50,14 @@ Keep input and output roots separate. Use the launcher to preserve originals:
 the base processor deletes its input pathname after export, while the launcher
 passes a private symbolic link. See [running instructions](docs/RUNNING.md).
 
+## Outputs
+
+Each run creates a fresh directory with numbered MP4 clips, `summary.csv`,
+per-video logs and `run_config.json`. The folders retain the study hierarchy.
+
+`ok`, `needs_review` and `failed` describe operational results. They do not
+measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.md).
+
 ## Repository map
 
 | Path | Purpose |
