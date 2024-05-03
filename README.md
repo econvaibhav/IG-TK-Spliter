@@ -68,6 +68,7 @@ measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.m
 | `IG_*_template.png`, `TK_*_template.png` | Six interface templates |
 | `run_hungary_splits.py` | Linux batch launcher |
 | `main*.py` | Legacy local and Slurm entry points |
+| `Run_in_Roihu.ipynb` | Notebook launcher |
 
 ## Documentation
 
