@@ -69,6 +69,7 @@ measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.m
 | `run_hungary_splits.py` | Linux batch launcher |
 | `main*.py` | Legacy local and Slurm entry points |
 | `Run_in_Roihu.ipynb` | Notebook launcher |
+| `archive/` | Recorded experiments and reference material |
 
 ## Documentation
 
