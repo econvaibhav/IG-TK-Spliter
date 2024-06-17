@@ -70,7 +70,8 @@ measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.m
 | `main*.py` | Legacy local and Slurm entry points |
 | `Run_in_Roihu.ipynb` | Notebook launcher |
 | `archive/` | Recorded experiments and reference material |
+| `docs/figures/` | LaTeX source and rendered workflow |
 
 ## Documentation
 
-[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md) · [Running instructions](docs/RUNNING.md) · [Outputs](docs/OUTPUTS.md) · [Recorded evidence](docs/EVIDENCE.md)
+[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md) · [Running instructions](docs/RUNNING.md) · [Outputs](docs/OUTPUTS.md) · [Recorded evidence](docs/EVIDENCE.md) · [Rebuild the diagram](docs/DIAGRAM.md)
