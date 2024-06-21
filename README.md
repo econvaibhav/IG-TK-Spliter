@@ -6,6 +6,10 @@ FeedSlicer uses on-screen interface cues to find possible transitions between
 feed items. OpenCV checks icon positions and feed geometry; FFmpeg exports
 the intervals from the recording.
 
+![FeedSlicer workflow: frame preparation, detector evidence, boundary rules, segment export and completion](docs/figures/feedslicer_workflow.png)
+
+[LaTeX/TikZ](docs/figures/feedslicer_workflow.tex) · [PDF](docs/figures/feedslicer_workflow.pdf) · [SVG](docs/figures/feedslicer_workflow.svg)
+
 ## How it works
 
 | Step | Behavior |
