@@ -75,6 +75,7 @@ measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.m
 | `Run_in_Roihu.ipynb` | Notebook launcher |
 | `archive/` | Recorded experiments and reference material |
 | `docs/figures/` | LaTeX source and rendered workflow |
+| `tools/verify_sources.py` | Source and asset checksum check |
 
 ## Documentation
 
