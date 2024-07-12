@@ -84,7 +84,7 @@ The diagnostic notebook shows `pts/dts pair unsupported` during an MP4 export. O
 
 The standalone `part_1 (2).mp4` failed the local FFprobe check with `moov atom not found`. It was left untouched and excluded from the repository. Its filename alone cannot establish which run produced it.
 
-The older archived README describes tests performed during an earlier task. Those statements remain inside the unchanged original document; this review does not claim to have repeated them. Source hashes and static checks are described in the verification guide when available.
+The older archived README describes tests performed during an earlier task. Those statements remain inside the unchanged original document; this review does not claim to have repeated them. Current checks are listed separately in [VALIDATION.md](VALIDATION.md).
 
 ## Potential future work, not implemented
 
