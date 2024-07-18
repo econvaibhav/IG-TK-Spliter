@@ -26,4 +26,5 @@ end-to-end-tested environment or a full lockfile.
 
 Recorded notebook outcomes are described in [EVIDENCE.md](EVIDENCE.md).
 Boundary accuracy, output coverage, timestamp fidelity and parallel throughput
-remain unmeasured here. Operational status is not a measurement of scientific accuracy.
+remain unmeasured here. Read [limitations](LIMITATIONS.md) before interpreting
+operational status as scientific evidence.
