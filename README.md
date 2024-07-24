@@ -79,4 +79,11 @@ measure segmentation accuracy. See [clip names and report fields](docs/OUTPUTS.m
 
 ## Documentation
 
-[Environment](docs/ENVIRONMENT.md) · [Instagram rules](docs/INSTAGRAM.md) · [TikTok rules](docs/TIKTOK.md) · [Exact method](docs/METHOD.md) · [Legacy Slurm workflow](docs/SLURM.md) · [Running instructions](docs/RUNNING.md) · [Outputs](docs/OUTPUTS.md) · [Recorded evidence](docs/EVIDENCE.md) · [Rebuild the diagram](docs/DIAGRAM.md) · [Code walkthrough](docs/CODE_STUDY.md) · [Verification](docs/VALIDATION.md) · [Limitations](docs/LIMITATIONS.md)
+- **Method:** [exact rules](docs/METHOD.md), [Instagram](docs/INSTAGRAM.md), [TikTok](docs/TIKTOK.md), [code walkthrough](docs/CODE_STUDY.md).
+- **Run:** [environment](docs/ENVIRONMENT.md), [batch launcher](docs/RUNNING.md), [Slurm scripts](docs/SLURM.md), [outputs](docs/OUTPUTS.md).
+- **Review:** [recorded evidence](docs/EVIDENCE.md), [verification](docs/VALIDATION.md), [limitations](docs/LIMITATIONS.md).
+- **Develop:** [rebuild the diagram](docs/DIAGRAM.md), [contributing](CONTRIBUTING.md).
+
+Check the original source and asset hashes with `python3 tools/verify_sources.py`.
+
+Author: **Vaibhav Agarwal**.
