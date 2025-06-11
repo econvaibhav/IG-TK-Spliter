@@ -1,11 +1,2 @@
-# Compatibility environment for the preserved code, assembled in September 2026.
-# Not a claim about dependency versions used in 2023-2024.
-# These five pins are recorded in the supplied notebook's isolated environment.
-moviepy==1.0.3
-decorator==4.4.2
-ffmpeg-python==0.2.0
-numpy==1.26.4
-opencv-python-headless==4.11.0.86
-# Legacy entry points import these even where little or none of their API is used.
-pandas>=1.5,<3
-tqdm>=4.11.2,<5
+numpy>=1.26,<3
+opencv-python-headless>=4.8,<5

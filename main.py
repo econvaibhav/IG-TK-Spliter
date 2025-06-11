@@ -1,84 +1,65 @@
-from instagram_processor import InstagramProcessor
-from tiktok_processor import TikTokProcessor
-import cv2
-
-from tqdm import tqdm
-import os
-import shutil
-import pandas as pd
-
-# # # # Example usage
-# video_url = 'video_IG2.mp4'
+"""Split one Instagram or TikTok MP4 screen recording."""
+import argparse
+from pathlib import Path
+import sys
 
 
-# For Instagram
-def instagram_wrapper(video_url):
-    template_heart = cv2.imread('IG_heart_template.png', 0)
-    template_comment = cv2.imread('IG_comment_template.png', 0)
-    template_share = cv2.imread('IG_share_template.png', 0)
+def main():
+    parser = argparse.ArgumentParser(
+        description="Split a screen-recorded feed into candidate clips; keep the input."
+    )
+    parser.add_argument("input", type=Path, help="Unsplit .mp4 screen recording")
+    parser.add_argument("--platform", required=True, type=str.lower,
+                        choices=("instagram", "tiktok"))
+    parser.add_argument("--output", type=Path,
+                        help="New output directory (default: <input_stem>_splits)")
+    parser.add_argument("--instagram-mode", choices=("both", "reels", "feed"),
+                        default="both", help="Instagram checks to run (default: both)")
+    parser.add_argument("--threshold", type=float, default=0.85,
+                        help="Normalized template-match threshold (default: 0.85)")
+    parser.add_argument("--templates-dir", type=Path,
+                        help="Directory containing replacement icon PNG templates")
+    parser.add_argument("--detect-only", action="store_true",
+                        help="Write boundaries and report without exporting MP4 clips")
+    args = parser.parse_args()
 
-    ig_processor = InstagramProcessor(video_url, template_heart, template_comment, template_share)
-    ig_processor.process_video()
+    if not 0 < args.threshold <= 1:
+        parser.error("--threshold must be greater than 0 and at most 1.")
+    if args.platform != "instagram" and args.instagram_mode != "both":
+        parser.error("--instagram-mode applies only to Instagram.")
 
+    try:
+        # Lazy imports let --help work before video dependencies are installed.
+        from instagram_processor import InstagramProcessor
+        from tiktok_processor import TikTokProcessor
 
-# # For TikTok
-# video_url = 'video_TK.mp4'
+        processor_type = (InstagramProcessor if args.platform == "instagram"
+                          else TikTokProcessor)
+        options = dict(output_dir=args.output, threshold=args.threshold,
+                       templates_dir=args.templates_dir)
+        if args.platform == "instagram":
+            options["mode"] = args.instagram_mode
 
-def tiktok_wrapper(video_url):
-    template_heart = cv2.imread('TK_heart_template.png', 0)
-    template_share = cv2.imread('TK_share_template.png', 0)
-    template_save = cv2.imread('TK_save_template.png', 0)
-
-    tk_processor = TikTokProcessor(video_url, template_heart, template_share, template_save)
-    tk_processor.process_video()
-
-
-def split_video_wrapper(folder_path):
-    all_files = [ "/scratch/project_2009497/MobileBackup/Finland/FI2/Synthetic/Instagram/az_recorder_20240613_163541.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Synthetic/Instagram/az_recorder_20240609_183757.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Organic/Tiktok/az_recorder_20240615_192852.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Organic/Tiktok/az_recorder_20240613_165230.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Organic/Instagram/az_recorder_20240615_194238.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Organic/Instagram/az_recorder_20240609_191229.mp4", "/scratch/project_2009497/MobileBackup/Finland/FI2/Organic/Instagram/az_recorder_20240610_223541.mp4"]
-
-    # # Walk through the directory tree
-    # for root, dirs, files in os.walk(folder_path):
-    #     for file in files:
-    #         file_name = os.path.join(root, file)
-    #         file_name_list = file_name.split('/')  
-    #         account_type = file_name_list[-2]
-    #         if account_type == 'Instagram' or account_type == 'Tiktok':
-    #             all_files.append(file_name)
-    # file_type_dic = {}
-
-
-    for file_name in tqdm(all_files):
-        file_name_list = file_name.split('/')  
-        account_type = file_name_list[-2]
-        
-        if account_type== 'Instagram':
-            print(file_name,account_type)
-            instagram_wrapper(file_name)
-
-        elif account_type == 'Tiktok':
-            print(file_name,account_type)
-            tiktok_wrapper(file_name)
-
-
-
-# folder_path = "/scratch/project_2009497/GrapheneOS/Sweden/SE1"
-conutry_code_dic ={
-'Bulgaria':'BG',
-# 'Croatia':'HR',
-# 'Finland':'FI',
-# 'France':'FR',
-# 'Germany':'DE',
-# 'Hungary':'HU',
-# 'Poland':'PL',
-# 'Portugal':'PT',
-# 'Spain':'ES',
-# 'Sweden':'SE'
-}
+        processor = processor_type(args.input, **options)
+        result = processor.process_video(detect_only=args.detect_only)
+        print(f"Status: {result['status']}")
+        print(f"Intervals: {len(result['segments'])}")
+        print(f"Output: {processor.output_dir}")
+        return 0
+    except ImportError as error:
+        print(
+            f"Missing dependency: {error}. "
+            "Run python -m pip install -r requirements.txt",
+            file=sys.stderr,
+        )
+        return 1
+    except (OSError, ValueError, RuntimeError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        print("Stopped. The original recording is unchanged.", file=sys.stderr)
+        return 130
 
 
-
-# for country in conutry_code_dic.keys():
-#     for i in range(1):
-#         print('/scratch/project_2009497/MobileBackup/'+country+'/'+conutry_code_dic[country]+str(i+1))
-#         folder_path = '/scratch/project_2009497/MobileBackup/'+country+'/'+conutry_code_dic[country]+str(i+1)
-split_video_wrapper('folder_path')
+if __name__ == "__main__":
+    raise SystemExit(main())
