@@ -1,26 +1,9 @@
-# Python runtimes and generated files
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-splitter_runtime_v1/
-.ipynb_checkpoints/
 .DS_Store
-
-# Study recordings and execution output
 *.mp4
 *.MP4
-*.mov
-*.zip
-data/
+*_splits/
 outputs/
-run_*/
-_work/
-_logs/
-Spain.txt
-
-# LaTeX intermediates; published PDF/PNG/SVG files are tracked
-*.aux
-*.log
-*.out
-*.synctex.gz
