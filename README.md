@@ -114,3 +114,37 @@ stream metadata. Missing or repeated OpenCV timestamps use approximate FPS timin
 with a warning. Decoding that ends well before the reported video end fails
 instead of silently reporting a complete run.
 
+## When to check or adjust the result
+
+This is an interface-position heuristic for screen-recorded feeds. It does not
+identify posts, recover downloaded originals, or find scene changes in arbitrary
+videos. Cuts are candidates for review.
+
+| Situation | What to do |
+| --- | --- |
+| App layout, icon size or recording crop differs | Review clips and supply matching templates; the fixed position rules may also need adjustment |
+| Too many cuts | Check the visible interface and selected Instagram mode; a stationary icon inside a trigger zone can repeatedly satisfy the rule |
+| Few or no cuts | Check platform, full-screen layout and templates; lowering the threshold also increases false matches |
+| Missing template or recording too narrow | Restore the template files or use a recording that includes the expected interface |
+| Missing audio | Supported automatically; video-only clips are written |
+| Invalid metadata, unreadable frames or a truncated file | Repair/remux the recording and run again into a new output folder |
+| Timestamp warning on variable-frame-rate video | Inspect the boundaries; FPS fallback is approximate |
+| FFmpeg error | Read the reported message and check FFmpeg, `libx264`, disk space and output permissions |
+
+Review representative recordings from each device and interface layout before
+processing a large collection. Re-encoding and heuristic timestamps mean cuts
+are not guaranteed to be lossless or exact to a particular source frame.
+
+## Files
+
+| File | Purpose |
+| --- | --- |
+| `main.py` | Command-line interface for one MP4 |
+| `video_processor.py` | Video validation, frame reading, matching, export and reports |
+| `instagram_processor.py` | Instagram icon and feed-layout rules |
+| `tiktok_processor.py` | TikTok icon rules |
+| `IG_*_template.png`, `TK_*_template.png` | Six templates used by the detectors |
+| `workflow.png` | Workflow image displayed above |
+| `requirements.txt` | OpenCV and NumPy dependencies |
+
+Author: **Vaibhav Agarwal**.
