@@ -1,5 +1,5 @@
 """TikTok icon-position boundary candidates."""
-from video_processor import VideoProcessor
+from .video_processor import VideoProcessor
 
 
 class TikTokProcessor(VideoProcessor):

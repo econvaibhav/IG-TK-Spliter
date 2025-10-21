@@ -38,7 +38,7 @@ class VideoProcessor:
 
         self.templates_dir = (
             Path(templates_dir).expanduser().resolve() if templates_dir else
-            Path(__file__).resolve().parent
+            Path(__file__).resolve().parent.parent / "templates" / self.platform
         )
         self.ffmpeg = shutil.which("ffmpeg")
         self.ffprobe = shutil.which("ffprobe")

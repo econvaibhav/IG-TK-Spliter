@@ -140,9 +140,9 @@ are not guaranteed to be lossless or exact to a particular source frame.
 | File | Purpose |
 | --- | --- |
 | `main.py` | Command-line interface for one MP4 |
-| `video_processor.py` | Video validation, frame reading, matching, export and reports |
-| `instagram_processor.py` | Instagram icon and feed-layout rules |
-| `tiktok_processor.py` | TikTok icon rules |
+| `feedslicer/video_processor.py` | Video validation, frame reading, matching, export and reports |
+| `feedslicer/instagram_processor.py` | Instagram icon and feed-layout rules |
+| `feedslicer/tiktok_processor.py` | TikTok icon rules |
 | `IG_*_template.png`, `TK_*_template.png` | Six templates used by the detectors |
 | `workflow.png` | Workflow image displayed above |
 | `requirements.txt` | OpenCV and NumPy dependencies |

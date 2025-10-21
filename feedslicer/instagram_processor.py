@@ -1,6 +1,6 @@
 """Instagram icon and feed-layout boundary candidates."""
 import cv2
-from video_processor import VideoProcessor
+from .video_processor import VideoProcessor
 
 
 class InstagramProcessor(VideoProcessor):
