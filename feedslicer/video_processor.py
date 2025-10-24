@@ -197,6 +197,22 @@ class VideoProcessor:
                 raise RuntimeError("FFmpeg export failed: " + result.stderr.strip())
             if not temporary.is_file() or temporary.stat().st_size == 0:
                 raise RuntimeError("FFmpeg produced no clip.")
+            check = subprocess.run(
+                [self.ffprobe, "-v", "error", "-select_streams", "v:0",
+                 "-count_packets", "-show_entries", "stream=nb_read_packets",
+                 "-of", "json", str(temporary)],
+                capture_output=True, text=True,
+            )
+            try:
+                streams = json.loads(check.stdout).get("streams", [])
+                packets = int(streams[0].get("nb_read_packets", 0)) if streams else 0
+            except (ValueError, TypeError, KeyError):
+                packets = 0
+            if check.returncode or packets <= 0:
+                raise RuntimeError(
+                    "FFmpeg produced a clip without readable video packets; "
+                    "the interval may fall between source frames."
+                )
             if destination.exists():
                 raise RuntimeError(f"Refusing to overwrite {destination}")
             temporary.replace(destination)
@@ -330,7 +346,10 @@ class VideoProcessor:
                     timestamp + 1.5 / self.fps, self.duration
                 )
                 for reason, minimum_gap in self.process_frame(resized):
-                    if candidate_time - self.last_cut > minimum_gap:
+                    # A cut after the final frame can leave an audio-only or
+                    # empty MP4 tail. Keep the remaining frame in the last clip.
+                    enough_tail = self.duration - candidate_time >= 1 / self.fps - 1e-9
+                    if candidate_time - self.last_cut > minimum_gap and enough_tail:
                         self.finish_interval(candidate_time, reason, detect_only)
 
                 self.frames_read += 1
