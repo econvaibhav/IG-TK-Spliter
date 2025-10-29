@@ -50,7 +50,7 @@ An existing output folder is refused: choose a different `--output` for another 
 | `--output PATH` | New folder for clips and reports |
 | `--instagram-mode both\|reels\|feed` | Both Instagram checks by default; restrict them when the recording contains only one interface |
 | `--threshold 0.85` | Normalized icon-match threshold; increasing it accepts fewer matches |
-| `--templates-dir PATH` | Replacement PNG templates, using the six existing filenames |
+| `--templates-dir PATH` | Folder containing the selected platform’s replacement PNGs, using the existing filenames |
 | `--detect-only` | Write boundaries and a report without encoding clips |
 
 For example, inspect candidate boundaries in a Reels-only recording:
@@ -59,8 +59,33 @@ For example, inspect candidate boundaries in a Reels-only recording:
 python main.py recording.mp4 --platform instagram --instagram-mode reels --detect-only --output preview
 ```
 
-For several files, run the same command once per recording with a distinct output
-folder. Keep platforms separate when choosing the detector.
+Use a separate directory for the real export after a preview:
+
+```bash
+python main.py recording.mp4 --platform instagram --instagram-mode reels --output clips
+```
+
+Open several exported clips and check the start/end times in `segments.csv`.
+A successful run alone does not establish that each interval is one post.
+For several files, run the command once per recording with a distinct output
+folder. Choose the platform for each recording explicitly.
+
+The same command is available as `python -m feedslicer` from the repository root.
+You can also call `/absolute/path/IG-TK-Spliter/main.py` from another directory;
+bundled templates are resolved relative to the installed source files.
+
+## Matching images
+
+The original six templates are kept in separate platform folders:
+
+| Platform | Folder | Images |
+| --- | --- | --- |
+| Instagram | `templates/instagram/` | [Heart](templates/instagram/IG_heart_template.png), [comment](templates/instagram/IG_comment_template.png), [share](templates/instagram/IG_share_template.png) |
+| TikTok | `templates/tiktok/` | [Heart](templates/tiktok/TK_heart_template.png), [share](templates/tiktok/TK_share_template.png), [save](templates/tiktok/TK_save_template.png) |
+
+These are the actual matching images, not illustrations. Their bytes are unchanged.
+The default folder is selected automatically by `--platform`. For replacement
+Instagram templates, for example, use `--templates-dir /path/to/my_instagram_icons`.
 
 ## What you get
 
@@ -111,8 +136,11 @@ last accepted boundary, so an icon cut prevents a second cut on the same frame.
 The candidate cut time uses the decoded frame timestamp plus the original
 `1.5 / FPS` adjustment, bounded by the video end. Duration comes from the video
 stream metadata. Missing or repeated OpenCV timestamps use approximate FPS timing
-with a warning. Decoding that ends well before the reported video end fails
-instead of silently reporting a complete run.
+with a warning. Candidate cuts leaving less than one nominal frame at the end
+are skipped, keeping that tail in the final clip. Each export must contain a
+video stream with readable packets before it is marked successful. Decoding
+that ends well before the reported video end fails instead of silently reporting
+a complete run.
 
 ## When to check or adjust the result
 
@@ -135,15 +163,26 @@ Review representative recordings from each device and interface layout before
 processing a large collection. Re-encoding and heuristic timestamps mean cuts
 are not guaranteed to be lossless or exact to a particular source frame.
 
+## Verification
+
+Synthetic MP4 checks passed for Instagram and TikTok icon transitions, audio and
+silent inputs, odd dimensions, variable frame rates, paths with spaces, preview
+mode, existing-output protection and cuts near the final frame. Exported clips
+were checked with ffprobe and decoded with FFmpeg; input file hashes were unchanged.
+These checks verify the matching and export mechanics, not boundary accuracy on
+real recordings. Review clips from your own device before a large run.
+
 ## Files
 
 | File | Purpose |
 | --- | --- |
-| `main.py` | Command-line interface for one MP4 |
-| `feedslicer/video_processor.py` | Video validation, frame reading, matching, export and reports |
+| `main.py` | Small launcher, preserving the existing command |
+| `feedslicer/cli.py` | Command-line arguments and detector selection |
+| `feedslicer/video_processor.py` | Validation, frame reading, matching, export and reports |
 | `feedslicer/instagram_processor.py` | Instagram icon and feed-layout rules |
 | `feedslicer/tiktok_processor.py` | TikTok icon rules |
-| `IG_*_template.png`, `TK_*_template.png` | Six templates used by the detectors |
+| `templates/instagram/` | Three Instagram matching templates |
+| `templates/tiktok/` | Three TikTok matching templates |
 | `workflow.png` | Workflow image displayed above |
 | `requirements.txt` | OpenCV and NumPy dependencies |
 
