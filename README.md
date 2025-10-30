@@ -1,11 +1,11 @@
-# FeedSlicer
+# Spliter
 
 **Split an Instagram or TikTok MP4 screen recording into candidate feed-item clips.**
 
 OpenCV detects interface cues; FFmpeg exports the resulting intervals.
 The original recording is kept. Run it with ordinary Python on your computer.
 
-![FeedSlicer workflow: frame preparation, detector evidence, boundary rules and clip export](workflow.png)
+![Spliter workflow: frame preparation, detector evidence, boundary rules and clip export](workflow.png)
 
 The command selects the platform explicitly and reads duration from MP4 metadata.
 The image summarizes the detector and export sequence.
@@ -70,7 +70,7 @@ A successful run alone does not establish that each interval is one post.
 For several files, run the command once per recording with a distinct output
 folder. Choose the platform for each recording explicitly.
 
-The same command is available as `python -m feedslicer` from the repository root.
+The same command is available as `python -m spliter` from the repository root.
 You can also call `/absolute/path/IG-TK-Spliter/main.py` from another directory;
 bundled templates are resolved relative to the installed source files.
 
@@ -177,10 +177,10 @@ real recordings. Review clips from your own device before a large run.
 | File | Purpose |
 | --- | --- |
 | `main.py` | Small launcher, preserving the existing command |
-| `feedslicer/cli.py` | Command-line arguments and detector selection |
-| `feedslicer/video_processor.py` | Validation, frame reading, matching, export and reports |
-| `feedslicer/instagram_processor.py` | Instagram icon and feed-layout rules |
-| `feedslicer/tiktok_processor.py` | TikTok icon rules |
+| `spliter/cli.py` | Command-line arguments and detector selection |
+| `spliter/video_processor.py` | Validation, frame reading, matching, export and reports |
+| `spliter/instagram_processor.py` | Instagram icon and feed-layout rules |
+| `spliter/tiktok_processor.py` | TikTok icon rules |
 | `templates/instagram/` | Three Instagram matching templates |
 | `templates/tiktok/` | Three TikTok matching templates |
 | `workflow.png` | Workflow image displayed above |
