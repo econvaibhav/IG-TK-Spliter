@@ -1,2 +1,4 @@
-include README.md requirements.txt main.py workflow.png
+include README.md requirements.txt environment.yml main.py workflow.png
 recursive-include spliter/templates *.png
+recursive-include tests *.py
+include .github/workflows/python-package.yml

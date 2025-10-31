@@ -3,7 +3,8 @@
 **Split an Instagram or TikTok MP4 screen recording into candidate feed-item clips.**
 
 OpenCV detects interface cues; FFmpeg exports the resulting intervals.
-The original recording is kept. Run it with ordinary Python on your computer.
+The original recording is kept. Install it once, then run `spliter` from any directory.
+The existing `python main.py ...` command also works from a source checkout.
 
 ![Spliter workflow: frame preparation, detector evidence, boundary rules and clip export](workflow.png)
 
@@ -26,15 +27,26 @@ Activate the environment with `source .venv/bin/activate` on macOS/Linux, or
 `.venv\Scripts\Activate.ps1` in Windows PowerShell, then run:
 
 ```bash
-python -m pip install -r requirements.txt
+python -m pip install .
 ffmpeg -version
 ffprobe -version
 ffmpeg -hide_banner -h encoder=libx264
+spliter doctor
 ```
 
-The last command should describe `Encoder libx264`. A successful version check
-alone does not mean FFmpeg includes the encoder needed to export clips.
+The encoder command should describe `Encoder libx264`. `spliter doctor` checks
+Python dependencies, all six matching images, and a real temporary H.264/AAC
+export. A version check alone does not confirm that the required encoder works.
+The diagnostic creates its own tiny test clip and removes it afterwards.
 On Windows, use `python` instead of `python3` when creating the environment.
+
+Already using the repository? Activate your existing environment and run
+`python -m pip install .` to add the `spliter` command. Run this installation command
+again after updating the checkout to refresh the installed copy. The original
+`python main.py ...` launcher continues to use the source checkout directly.
+
+The distribution is named `ig-tk-spliter`; its command and import package are
+`spliter`. Installation from this checkout does not require a PyPI release.
 
 ### Fedora: enable H.264 export
 
@@ -62,13 +74,18 @@ See [RPM Fusion setup](https://rpmfusion.org/Configuration) and its
 
 ## Split one recording
 
-Choose the platform explicitly. The input can be anywhere; it does not need a
-particular folder structure. Quote paths containing spaces.
+The input can be anywhere; it does not need a particular folder structure.
+Quote paths containing spaces. Use the full platform name or its short alias
+(`ig` for Instagram, `tk` for TikTok):
 
 ```bash
-python main.py "/path/to/recording.mp4" --platform instagram
-python main.py "/path/to/recording.mp4" --platform tiktok --output "/path/to/new_clips"
+spliter "/path/to/recording.mp4" --platform instagram
+spliter "/path/to/recording.mp4" --platform tiktok --output "/path/to/new_clips"
 ```
+
+At an interactive terminal, omit `--platform` to select **1. Instagram** or
+**2. TikTok** from a menu. For scripts and scheduled jobs, always pass `--platform`;
+a noninteractive invocation without it exits with a clear error.
 
 The default output is a new `recording_splits` folder beside the input.
 With `--output split_run`, clips go into `split_run` under your terminal's current
@@ -76,7 +93,7 @@ directory. Use an absolute output path to choose the location explicitly. For
 example, on Linux or macOS:
 
 ```bash
-python main.py "$HOME/Downloads/video_TK.mp4" \
+spliter "$HOME/Downloads/video_TK.mp4" \
   --platform tiktok \
   --output "$HOME/Downloads/video_TK_clips"
 ```
@@ -88,7 +105,7 @@ The original MP4 is preserved.
 
 | Option | Meaning |
 | --- | --- |
-| `--platform instagram\|tiktok` | Required detector selection |
+| `--platform instagram\|tiktok\|ig\|tk` | Detector selection; required for noninteractive runs |
 | `--output PATH` | New folder for clips and reports |
 | `--instagram-mode both\|reels\|feed` | Both Instagram checks by default; restrict them when the recording contains only one interface |
 | `--threshold 0.85` | Normalized icon-match threshold; increasing it accepts fewer matches |
@@ -98,13 +115,13 @@ The original MP4 is preserved.
 For example, inspect candidate boundaries in a Reels-only recording:
 
 ```bash
-python main.py recording.mp4 --platform instagram --instagram-mode reels --detect-only --output preview
+spliter recording.mp4 --platform instagram --instagram-mode reels --detect-only --output preview
 ```
 
 Use a separate directory for the real export after a preview:
 
 ```bash
-python main.py recording.mp4 --platform instagram --instagram-mode reels --output clips
+spliter recording.mp4 --platform instagram --instagram-mode reels --output clips
 ```
 
 Open several exported clips and check the start/end times in `segments.csv`.
@@ -112,13 +129,14 @@ A successful run alone does not establish that each interval is one post.
 For several files, run the command once per recording with a distinct output
 folder. Choose the platform for each recording explicitly.
 
-The same command is available as `python -m spliter` from the repository root.
-You can also call `/absolute/path/IG-TK-Spliter/main.py` from another directory;
-bundled templates are resolved relative to the source files.
+The same interface is available as `python -m spliter`. From a source checkout,
+`python main.py` also works, including `python main.py doctor`. Bundled templates
+are loaded from package resources; they do not depend on the working directory.
+Use `spliter --version` to check the installed version.
 
 ## Matching images
 
-The original six templates are kept in separate platform folders:
+The original six templates are included in the installed package and kept in separate platform folders:
 
 | Platform | Folder | Images |
 | --- | --- | --- |
@@ -207,27 +225,111 @@ Review representative recordings from each device and interface layout before
 processing a large collection. Re-encoding and heuristic timestamps mean cuts
 are not guaranteed to be lossless or exact to a particular source frame.
 
+## Optional environment with FFmpeg
+
+<details>
+<summary>Conda / Miniforge on a workstation</summary>
+
+If Conda is already available, `environment.yml` creates a separate environment
+with Python 3.12, pip, Git and a GPL-enabled FFmpeg build from conda-forge. Run
+these commands from the repository root:
+
+```bash
+conda env create -f environment.yml
+conda activate ig-tk-spliter
+python -m pip install .
+spliter doctor
+```
+
+The package installation adds NumPy and headless OpenCV. The environment's FFmpeg
+is used while it is active; it does not replace the system installation. The
+YAML specifies version ranges, not an exact lockfile. Record `spliter --version`
+and your resolved dependency versions when reproducing a study.
+
+</details>
+
+<details>
+<summary>Roihu: reuse the environment through Tykky</summary>
+
+CSC recommends containerized environments for Conda installations on its shared
+filesystems. Tykky can use this repository's environment definition and expose
+`spliter`, FFmpeg and Python through ordinary commands.
+
+Clone the repository on Roihu and run the following from its root. Replace
+`<your-project>` with your CSC project ID. Choose a new installation directory.
+The package requirement is pinned to the checkout's Git commit, which must
+already have been pushed to GitHub.
+
+```bash
+module purge
+module load tykky
+
+SPLITER_ENV="/projappl/<your-project>/spliter-0.1.0"
+SPLITER_REQ="$(mktemp "$PWD/spliter-install.XXXXXX.txt")"
+printf 'ig-tk-spliter @ git+https://github.com/econvaibhav/IG-TK-Spliter.git@%s\n' "$(git rev-parse HEAD)" > "$SPLITER_REQ"
+mkdir "$SPLITER_ENV"
+conda-containerize new -r "$SPLITER_REQ" --prefix "$SPLITER_ENV" environment.yml
+
+tykky activate "$SPLITER_ENV"
+spliter doctor
+```
+
+After installation, reuse the environment rather than rebuilding it for each
+recording. Activate it in an allocated interactive session or batch job and
+pass the platform explicitly, for example:
+
+```bash
+spliter "/path/to/recording.mp4" --platform tk --output "/path/to/new_clips"
+```
+
+Run long splitting jobs on allocated compute resources. Build the environment
+for the node architecture you intend to use. The Conda recipe is checked in
+GitHub Actions; actual Roihu execution must still be checked in your allocation.
+See [CSC's Tykky guide](https://docs.csc.fi/computing/containers/tykky/) and
+[Python usage guide](https://docs.csc.fi/support/tutorials/python-usage-guide/).
+
+</details>
+
 ## Verification
 
-Synthetic MP4 checks passed for Instagram and TikTok icon transitions, audio and
-silent inputs, odd dimensions, variable frame rates, paths with spaces, preview
-mode, existing-output protection and cuts near the final frame. Exported clips
-were checked with ffprobe and decoded with FFmpeg; input file hashes were unchanged.
-These checks verify the matching and export mechanics, not boundary accuracy on
-real recordings. Review clips from your own device before a large run.
+The GitHub Actions workflow builds a source distribution and wheel, installs
+the wheel, and runs tests outside the checkout on Python 3.10, 3.12 and 3.14.
+It also checks the Conda environment and runs a focused Ruff lint check. Test
+videos are generated during the run; study recordings are not needed.
+
+Successful Python 3.12 runs attach the wheel and source archive under
+**Actions → Python package → run → Artifacts**, available for 14 days.
+
+Checks cover packaged templates, Instagram/TikTok transitions, audio and silent
+inputs, odd dimensions, preview mode, input preservation and output protection.
+The setup check tests real H.264/AAC encoding. These verify installation and
+export mechanics, not boundary accuracy on every app layout.
+
+To run the tests locally from the checkout:
+
+```bash
+python -m pip install ".[test]"
+python -m pytest
+```
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
 | `main.py` | Small launcher, preserving the existing command |
-| `spliter/cli.py` | Command-line arguments and detector selection |
+| `spliter/cli.py` | Arguments, platform aliases and terminal selection |
+| `spliter/doctor.py` | Dependency, template and real encoding checks |
 | `spliter/video_processor.py` | Validation, frame reading, matching, export and reports |
 | `spliter/instagram_processor.py` | Instagram icon and feed-layout rules |
 | `spliter/tiktok_processor.py` | TikTok icon rules |
 | `spliter/templates/instagram/` | Three Instagram matching templates |
 | `spliter/templates/tiktok/` | Three TikTok matching templates |
 | `workflow.png` | Workflow image displayed above |
-| `requirements.txt` | OpenCV and NumPy dependencies |
+| `requirements.txt` | OpenCV and NumPy dependencies, also read by package metadata |
+| `pyproject.toml` | Package metadata, installed command and bundled data |
+| `MANIFEST.in` | Files included in source distributions |
+| `environment.yml` | Optional Conda / Tykky environment with FFmpeg |
+| `tests/` | Generated-video and installation checks |
+| `.github/workflows/python-package.yml` | Build, lint and test automation |
 
 Author: **Vaibhav Agarwal**.

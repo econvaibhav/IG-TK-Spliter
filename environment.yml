@@ -1,0 +1,14 @@
+# Create with: conda env create -f environment.yml
+# Then: conda activate ig-tk-spliter && python -m pip install .
+# NumPy and headless OpenCV come from the Python package, not duplicate conda packages.
+# The GPL FFmpeg variant includes the libx264 encoder used for MP4 export.
+name: ig-tk-spliter
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pip
+  # Needed when Tykky installs a commit-pinned Git requirement.
+  - git>=2,<3
+  - "ffmpeg >=5.1,<9 gpl_*"

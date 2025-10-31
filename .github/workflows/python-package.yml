@@ -1,0 +1,127 @@
+name: Python package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-package-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  wheel:
+    name: Installed wheel / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            pyproject.toml
+            requirements.txt
+      - name: Install FFmpeg and build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install build ruff "pytest>=8,<10"
+      - name: Check critical Python errors
+        run: python -m ruff check spliter tests main.py
+      - name: Build sdist, then build the wheel from that sdist
+        # The default build verifies that the sdist is sufficient to build a wheel.
+        run: python -m build
+      - name: Install the wheel
+        run: |
+          python -m pip install dist/*.whl
+          python -m pip check
+      - name: Test installed package away from the checkout
+        run: |
+          test_dir="$(mktemp -d "$RUNNER_TEMP/spliter-wheel.XXXXXX")"
+          cp -R tests "$test_dir/tests"
+          cd "$test_dir"
+          unset PYTHONPATH
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import spliter
+
+          installed = Path(spliter.__file__).resolve()
+          checkout = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          assert not installed.is_relative_to(checkout), installed
+          print(f"Testing installed package: {installed}")
+          PY
+          spliter --help
+          spliter doctor
+          python -m pytest --import-mode=importlib -q tests
+      - name: Save the tested distributions
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: ig-tk-spliter-distributions
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  conda:
+    name: Conda environment / Python 3.12
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
+        with:
+          miniforge-version: latest
+          activate-environment: ig-tk-spliter
+          environment-file: environment.yml
+          channel-priority: strict
+          conda-remove-defaults: true
+      - name: Build and install the wheel in the conda environment
+        run: |
+          python -m pip install build "pytest>=8,<10"
+          python -m build
+          python -m pip install dist/*.whl
+          python -m pip check
+      - name: Verify the environment's FFmpeg and test the installed package
+        run: |
+          test_dir="$(mktemp -d "$RUNNER_TEMP/spliter-conda.XXXXXX")"
+          cp -R tests "$test_dir/tests"
+          cd "$test_dir"
+          unset PYTHONPATH
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import shutil
+          import sys
+          import spliter
+
+          prefix = Path(sys.prefix).resolve()
+          for name in ("ffmpeg", "ffprobe", "git"):
+              executable = shutil.which(name)
+              assert executable is not None, f"{name} was not installed"
+              assert Path(executable).resolve().is_relative_to(prefix), executable
+              print(f"Using {executable}")
+          checkout = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          assert not Path(spliter.__file__).resolve().is_relative_to(checkout)
+          PY
+          spliter doctor
+          python -m pytest --import-mode=importlib -q tests
