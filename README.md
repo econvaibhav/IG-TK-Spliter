@@ -19,7 +19,7 @@ package manager or the [FFmpeg download page](https://ffmpeg.org/download.html).
 ```bash
 git clone https://github.com/econvaibhav/IG-TK-Spliter.git
 cd IG-TK-Spliter
-python -m venv .venv
+python3 -m venv .venv
 ```
 
 Activate the environment with `source .venv/bin/activate` on macOS/Linux, or
@@ -29,7 +29,36 @@ Activate the environment with `source .venv/bin/activate` on macOS/Linux, or
 python -m pip install -r requirements.txt
 ffmpeg -version
 ffprobe -version
+ffmpeg -hide_banner -h encoder=libx264
 ```
+
+The last command should describe `Encoder libx264`. A successful version check
+alone does not mean FFmpeg includes the encoder needed to export clips.
+On Windows, use `python` instead of `python3` when creating the environment.
+
+### Fedora: enable H.264 export
+
+If exporting fails with `Unknown encoder 'libx264'`, install the full FFmpeg
+build from RPM Fusion. These steps enable its free repository and replace
+`ffmpeg-free`. Run each command separately and review DNF's proposed package
+changes before confirming:
+
+```bash
+sudo dnf install "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+sudo dnf swap ffmpeg-free ffmpeg --allowerasing
+```
+
+Then check that the encoder is listed:
+
+```bash
+ffmpeg -hide_banner -encoders 2>/dev/null | grep libx264
+```
+
+Continue once a line containing `libx264` appears. If DNF reports a dependency
+error, resolve that installation error before rerunning the splitter. This is a
+system FFmpeg installation; it does not require recreating the Python environment.
+See [RPM Fusion setup](https://rpmfusion.org/Configuration) and its
+[multimedia guide](https://rpmfusion.org/Howto/Multimedia).
 
 ## Split one recording
 
@@ -42,7 +71,20 @@ python main.py "/path/to/recording.mp4" --platform tiktok --output "/path/to/new
 ```
 
 The default output is a new `recording_splits` folder beside the input.
-An existing output folder is refused: choose a different `--output` for another run.
+With `--output split_run`, clips go into `split_run` under your terminal's current
+directory. Use an absolute output path to choose the location explicitly. For
+example, on Linux or macOS:
+
+```bash
+python main.py "$HOME/Downloads/video_TK.mp4" \
+  --platform tiktok \
+  --output "$HOME/Downloads/video_TK_clips"
+```
+
+An existing output folder is refused: choose a different `--output` for another
+run. A failed export can leave a folder containing its report or completed clips.
+After fixing the error, select a new output folder; no deletion is required.
+The original MP4 is preserved.
 
 | Option | Meaning |
 | --- | --- |
@@ -72,7 +114,7 @@ folder. Choose the platform for each recording explicitly.
 
 The same command is available as `python -m spliter` from the repository root.
 You can also call `/absolute/path/IG-TK-Spliter/main.py` from another directory;
-bundled templates are resolved relative to the installed source files.
+bundled templates are resolved relative to the source files.
 
 ## Matching images
 
@@ -157,6 +199,8 @@ videos. Cuts are candidates for review.
 | Missing audio | Supported automatically; video-only clips are written |
 | Invalid metadata, unreadable frames or a truncated file | Repair/remux the recording and run again into a new output folder |
 | Timestamp warning on variable-frame-rate video | Inspect the boundaries; FPS fallback is approximate |
+| `Unknown encoder 'libx264'` | Install an FFmpeg build containing `libx264`; on Fedora, follow [the steps above](#fedora-enable-h264-export) |
+| `Output already exists` after a failed attempt | Choose a new `--output`; the previous folder can remain in place |
 | FFmpeg error | Read the reported message and check FFmpeg, `libx264`, disk space and output permissions |
 
 Review representative recordings from each device and interface layout before
