@@ -122,8 +122,8 @@ The original six templates are kept in separate platform folders:
 
 | Platform | Folder | Images |
 | --- | --- | --- |
-| Instagram | `templates/instagram/` | [Heart](templates/instagram/IG_heart_template.png), [comment](templates/instagram/IG_comment_template.png), [share](templates/instagram/IG_share_template.png) |
-| TikTok | `templates/tiktok/` | [Heart](templates/tiktok/TK_heart_template.png), [share](templates/tiktok/TK_share_template.png), [save](templates/tiktok/TK_save_template.png) |
+| Instagram | `spliter/templates/instagram/` | [Heart](spliter/templates/instagram/IG_heart_template.png), [comment](spliter/templates/instagram/IG_comment_template.png), [share](spliter/templates/instagram/IG_share_template.png) |
+| TikTok | `spliter/templates/tiktok/` | [Heart](spliter/templates/tiktok/TK_heart_template.png), [share](spliter/templates/tiktok/TK_share_template.png), [save](spliter/templates/tiktok/TK_save_template.png) |
 
 These are the actual matching images, not illustrations. Their bytes are unchanged.
 The default folder is selected automatically by `--platform`. For replacement
@@ -225,8 +225,8 @@ real recordings. Review clips from your own device before a large run.
 | `spliter/video_processor.py` | Validation, frame reading, matching, export and reports |
 | `spliter/instagram_processor.py` | Instagram icon and feed-layout rules |
 | `spliter/tiktok_processor.py` | TikTok icon rules |
-| `templates/instagram/` | Three Instagram matching templates |
-| `templates/tiktok/` | Three TikTok matching templates |
+| `spliter/templates/instagram/` | Three Instagram matching templates |
+| `spliter/templates/tiktok/` | Three TikTok matching templates |
 | `workflow.png` | Workflow image displayed above |
 | `requirements.txt` | OpenCV and NumPy dependencies |
 

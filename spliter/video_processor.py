@@ -1,6 +1,7 @@
 """Shared MP4 reading, template matching, boundary checks and FFmpeg export."""
 import csv
 from fractions import Fraction
+from importlib.resources import files
 import json
 import math
 from pathlib import Path
@@ -38,7 +39,7 @@ class VideoProcessor:
 
         self.templates_dir = (
             Path(templates_dir).expanduser().resolve() if templates_dir else
-            Path(__file__).resolve().parent.parent / "templates" / self.platform
+            files("spliter").joinpath("templates").joinpath(self.platform)
         )
         self.ffmpeg = shutil.which("ffmpeg")
         self.ffprobe = shutil.which("ffprobe")

@@ -7,3 +7,9 @@ venv/
 *.MP4
 *_splits/
 outputs/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+/spliter-install.*.txt

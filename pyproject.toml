@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ig-tk-spliter"
+description = "Split Instagram and TikTok MP4 screen recordings using interface cues."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Vaibhav Agarwal"}]
+dynamic = ["version", "dependencies"]
+
+[project.scripts]
+spliter = "spliter.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.urls]
+Repository = "https://github.com/econvaibhav/IG-TK-Spliter"
+
+[tool.setuptools]
+packages = ["spliter"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+spliter = ["templates/instagram/*.png", "templates/tiktok/*.png"]
+
+[tool.setuptools.dynamic]
+version = {attr = "spliter.__version__"}
+dependencies = {file = ["requirements.txt"]}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --import-mode=importlib"
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E9", "F"]
