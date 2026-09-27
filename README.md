@@ -135,15 +135,12 @@ Instagram templates, for example, use `--templates-dir /path/to/my_instagram_ico
 
 With `--detect-only`, MP4s are not created; CSV filenames describe planned clips.
 No detected boundaries means one whole-recording interval, marked for review.
-Clips use H.264 video and AAC audio when the recording has audio. Silent recordings
-are supported. Exports retain the source's displayed resolution, with up to one
-padding pixel on an odd-width or odd-height edge for H.264 compatibility.
-The 960-pixel analysis image is never used as the exported video.
 
-`completed` means the run finished. `needs_review` means it finished with warnings,
-such as no detected transition or approximate timing. Neither is an accuracy score.
-A failed run exits with an error; any completed clips and its report remain in that
-run's folder as partial results.
+
+Clips use H.264 video and AAC audio when the recording has audio. Silent recordings
+are supported. 
+
+The 960-pixel analysis image is never used as the exported video.
 
 ## Detection method
 
@@ -165,131 +162,8 @@ run's folder as partial results.
 | TikTok icons | BGR 220–255; no contour fill | Heart `y ≤ 480`, share `y ≤ 600`, or save `y ≤ 564.71`; each also accepts `y > 807.62` | Strictly >0.4 s |
 
 Icon matching uses `TM_CCOEFF_NORMED` and accepts scores at least the selected
-threshold, normally 0.85. It takes the first qualifying location in row order
-with top-left `x > 360`; `y` is the icon's top-left coordinate. Each template
-sees the same unmodified prepared image. Templates are fixed-size grayscale PNGs.
+threshold, normally 0.85. 
 
-Instagram evaluates icons before feed geometry on each frame. Both share the
-last accepted boundary, so an icon cut prevents a second cut on the same frame.
-
-The candidate cut time uses the decoded frame timestamp plus the original
-`1.5 / FPS` adjustment, bounded by the video end. Duration comes from the video
-stream metadata. Missing or repeated OpenCV timestamps use approximate FPS timing
-with a warning. Candidate cuts leaving less than one nominal frame at the end
-are skipped, keeping that tail in the final clip. Each export must contain a
-video stream with readable packets before it is marked successful. Decoding
-that ends well before the reported video end fails instead of silently reporting
-a complete run.
-
-## When to check or adjust the result
-
-This is an interface-position heuristic for screen-recorded feeds. It does not
-identify posts, recover downloaded originals, or find scene changes in arbitrary
-videos. Cuts are candidates for review.
-
-| Situation | What to do |
-| --- | --- |
-| App layout, icon size or recording crop differs | Review clips and supply matching templates; the fixed position rules may also need adjustment |
-| Too many cuts | Check the visible interface and selected Instagram mode; a stationary icon inside a trigger zone can repeatedly satisfy the rule |
-| Few or no cuts | Check platform, full-screen layout and templates; lowering the threshold also increases false matches |
-| Missing template or recording too narrow | Restore the template files or use a recording that includes the expected interface |
-| Missing audio | Supported automatically; video-only clips are written |
-| Invalid metadata, unreadable frames or a truncated file | Repair/remux the recording and run again into a new output folder |
-| Timestamp warning on variable-frame-rate video | Inspect the boundaries; FPS fallback is approximate |
-| `Unknown encoder 'libx264'` | Install an FFmpeg build containing `libx264`; on Fedora, follow [the steps above](#fedora-enable-h264-export) |
-| `Output already exists` after a failed attempt | Choose a new `--output`; the previous folder can remain in place |
-| FFmpeg error | Read the reported message and check FFmpeg, `libx264`, disk space and output permissions |
-
-Review representative recordings from each device and interface layout before
-processing a large collection. Re-encoding and heuristic timestamps mean cuts
-are not guaranteed to be lossless or exact to a particular source frame.
-
-## Optional environment with FFmpeg
-
-<details>
-<summary>Conda / Miniforge on a workstation</summary>
-
-If Conda is already available, `environment.yml` creates a separate environment
-with Python 3.12, pip, Git and a GPL-enabled FFmpeg build from conda-forge. Run
-these commands from the repository root:
-
-```bash
-conda env create -f environment.yml
-conda activate ig-tk-spliter
-python -m pip install .
-spliter doctor
-```
-
-The package installation adds NumPy and headless OpenCV. The environment's FFmpeg
-is used while it is active; it does not replace the system installation. The
-YAML specifies version ranges, not an exact lockfile. Record `spliter --version`
-and your resolved dependency versions when reproducing a study.
-
-</details>
-
-<details>
-<summary>Roihu: reuse the environment through Tykky</summary>
-
-CSC recommends containerized environments for Conda installations on its shared
-filesystems. Tykky can use this repository's environment definition and expose
-`spliter`, FFmpeg and Python through ordinary commands.
-
-Clone the repository on Roihu and run the following from its root. Replace
-`<your-project>` with your CSC project ID. Choose a new installation directory.
-The package requirement is pinned to the checkout's Git commit, which must
-already have been pushed to GitHub.
-
-```bash
-module purge
-module load tykky
-
-SPLITER_ENV="/projappl/<your-project>/spliter-0.1.0"
-SPLITER_REQ="$(mktemp "$PWD/spliter-install.XXXXXX.txt")"
-printf 'ig-tk-spliter @ git+https://github.com/econvaibhav/IG-TK-Spliter.git@%s\n' "$(git rev-parse HEAD)" > "$SPLITER_REQ"
-mkdir "$SPLITER_ENV"
-conda-containerize new -r "$SPLITER_REQ" --prefix "$SPLITER_ENV" environment.yml
-
-tykky activate "$SPLITER_ENV"
-spliter doctor
-```
-
-After installation, reuse the environment rather than rebuilding it for each
-recording. Activate it in an allocated interactive session or batch job and
-pass the platform explicitly, for example:
-
-```bash
-spliter "/path/to/recording.mp4" --platform tk --output "/path/to/new_clips"
-```
-
-Run long splitting jobs on allocated compute resources. Build the environment
-for the node architecture you intend to use. The Conda recipe is checked in
-GitHub Actions; actual Roihu execution must still be checked in your allocation.
-See [CSC's Tykky guide](https://docs.csc.fi/computing/containers/tykky/) and
-[Python usage guide](https://docs.csc.fi/support/tutorials/python-usage-guide/).
-
-</details>
-
-## Verification
-
-The GitHub Actions workflow builds a source distribution and wheel, installs
-the wheel, and runs tests outside the checkout on Python 3.10, 3.12 and 3.14.
-It also checks the Conda environment and runs a focused Ruff lint check. Test
-videos are generated during the run; study recordings are not needed.
-
-Successful Python 3.12 runs attach the wheel and source archive under
-**Actions → Python package → run → Artifacts**, available for 14 days.
-
-Checks cover packaged templates, Instagram/TikTok transitions, audio and silent
-inputs, odd dimensions, preview mode, input preservation and output protection.
-The setup check tests real H.264/AAC encoding. These verify installation and
-export mechanics, not boundary accuracy on every app layout.
-
-To run the tests locally from the checkout:
-
-```bash
-python -m pip install ".[test]"
-python -m pytest
-```
 
 ## Files
 
