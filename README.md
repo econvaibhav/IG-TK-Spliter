@@ -1,4 +1,4 @@
-# Spliter
+# IG-TK-Spliter
 
 **Split an Instagram or TikTok MP4 screen recording into individual clips.**
 
