@@ -185,4 +185,4 @@ threshold, normally 0.85.
 | `tests/` | Generated-video and installation checks |
 | `.github/workflows/python-package.yml` | Build, lint and test automation |
 
-Author: **Vaibhav Agarwal**.
+Developed by **Andrew Zaki (University of Helsinki)** and **Vaibhav Agarwal (University of Helsinki, Technical University of Munich)** for the various funded research projects at **HEPP Consortium (Helsinki Hub on Emotions, Populism and Polarisation)**. 
