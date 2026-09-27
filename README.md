@@ -1,15 +1,13 @@
 # Spliter
 
-**Split an Instagram or TikTok MP4 screen recording into candidate feed-item clips.**
+**Split an Instagram or TikTok MP4 screen recording into individual clips.**
 
-OpenCV detects interface cues; FFmpeg exports the resulting intervals.
+OpenCV detect interface cues + FFmpeg exports the resulting intervals.
+
 The original recording is kept. Install it once, then run `spliter` from any directory.
-The existing `python main.py ...` command also works from a source checkout.
 
 ![Spliter workflow: frame preparation, detector evidence, boundary rules and clip export](workflow.png)
 
-The command selects the platform explicitly and reads duration from MP4 metadata.
-The image summarizes the detector and export sequence.
 
 ## Install
 
@@ -23,8 +21,7 @@ cd IG-TK-Spliter
 python3 -m venv .venv
 ```
 
-Activate the environment with `source .venv/bin/activate` on macOS/Linux, or
-`.venv\Scripts\Activate.ps1` in Windows PowerShell, then run:
+Activate the environment with `source .venv/bin/activate` then:
 
 ```bash
 python -m pip install .
@@ -38,15 +35,9 @@ The encoder command should describe `Encoder libx264`. `spliter doctor` checks
 Python dependencies, all six matching images, and a real temporary H.264/AAC
 export. A version check alone does not confirm that the required encoder works.
 The diagnostic creates its own tiny test clip and removes it afterwards.
-On Windows, use `python` instead of `python3` when creating the environment.
-
-Already using the repository? Activate your existing environment and run
-`python -m pip install .` to add the `spliter` command. Run this installation command
-again after updating the checkout to refresh the installed copy. The original
-`python main.py ...` launcher continues to use the source checkout directly.
 
 The distribution is named `ig-tk-spliter`; its command and import package are
-`spliter`. Installation from this checkout does not require a PyPI release.
+`spliter`.
 
 ### Fedora: enable H.264 export
 
@@ -66,11 +57,7 @@ Then check that the encoder is listed:
 ffmpeg -hide_banner -encoders 2>/dev/null | grep libx264
 ```
 
-Continue once a line containing `libx264` appears. If DNF reports a dependency
-error, resolve that installation error before rerunning the splitter. This is a
-system FFmpeg installation; it does not require recreating the Python environment.
-See [RPM Fusion setup](https://rpmfusion.org/Configuration) and its
-[multimedia guide](https://rpmfusion.org/Howto/Multimedia).
+Continue once a line containing `libx264` appears.
 
 ## Split one recording
 
@@ -82,10 +69,6 @@ Quote paths containing spaces. Use the full platform name or its short alias
 spliter "/path/to/recording.mp4" --platform instagram
 spliter "/path/to/recording.mp4" --platform tiktok --output "/path/to/new_clips"
 ```
-
-At an interactive terminal, omit `--platform` to select **1. Instagram** or
-**2. TikTok** from a menu. For scripts and scheduled jobs, always pass `--platform`;
-a noninteractive invocation without it exits with a clear error.
 
 The default output is a new `recording_splits` folder beside the input.
 With `--output split_run`, clips go into `split_run` under your terminal's current
@@ -105,7 +88,7 @@ The original MP4 is preserved.
 
 | Option | Meaning |
 | --- | --- |
-| `--platform instagram\|tiktok\|ig\|tk` | Detector selection; required for noninteractive runs |
+| `--platform instagram\|tiktok\|ig\|tk` | Detector selection|
 | `--output PATH` | New folder for clips and reports |
 | `--instagram-mode both\|reels\|feed` | Both Instagram checks by default; restrict them when the recording contains only one interface |
 | `--threshold 0.85` | Normalized icon-match threshold; increasing it accepts fewer matches |
@@ -129,10 +112,6 @@ A successful run alone does not establish that each interval is one post.
 For several files, run the command once per recording with a distinct output
 folder. Choose the platform for each recording explicitly.
 
-The same interface is available as `python -m spliter`. From a source checkout,
-`python main.py` also works, including `python main.py doctor`. Bundled templates
-are loaded from package resources; they do not depend on the working directory.
-Use `spliter --version` to check the installed version.
 
 ## Matching images
 
